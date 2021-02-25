@@ -33,20 +33,6 @@ class Artist extends Component {
           tags: artistBio.artist.tags.tag,
           similarArtist: similar
         }, ()=>{console.log(this.state.imageURL)})
-
-        // if(res.data){
-            //     console.log(res.data)
-            //     let albuminfo = await res.data.topalbums.album.map(async albums =>{
-            //         let albumUrl=` http://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=${API_KEY}&artist=${this.state.artistName}&album=${albums.name}&format=json`
-            //             let albummetadata=await axios
-            //             .get(albumUrl)
-            //             .then(result => result.data)
-            //             .catch(error => {
-            //                 console.log(error);
-            //             });
-            //             console.log(albummetadata)
-
-            //         })
        
         let albumUrl=`http://ws.audioscrobbler.com/2.0/?method=artist.gettopalbums&artist=${this.state.artistName}&api_key=${API_KEY}&format=json`
         

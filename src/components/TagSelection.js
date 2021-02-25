@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import axios from "axios";
 import { Redirect, Link, withRouter } from "react-router-dom";
-import { Dropdown } from "react-bootstrap";
+import styles from "../styles/TagSelection.css";
+
 
 class TagSelection extends Component {
   constructor() {
@@ -15,6 +16,7 @@ class TagSelection extends Component {
     
 
   async getTopArtist(tagName){
+      this.setState({ artistTotalListener: []}, ()=>{console.log(this.state.artistTotalListener)})
       const API_KEY=process.env.REACT_APP_API_KEY
       let url=`http://ws.audioscrobbler.com/2.0/?method=tag.gettopartists&tag=${tagName}&api_key=${API_KEY}&format=json`
         
@@ -101,16 +103,26 @@ class TagSelection extends Component {
 
       let artist= this.state.artistTotalListener.map(artist=> {
         return(
-        <li key={artist.name} onClick={() => {this.getArtistInfo(artist.name)}}>
-            {artist.name }
-            {artist.totalListeners}
-          </li> 
+          <tr key={artist.name} onClick={() => {this.getArtistInfo(artist.name)}}>
+            <td>{artist.name}</td>
+            <td>{artist.totalListeners}</td>
+          </tr>
         )
       })
+
         return (
-            <div>  
-               <ul>{tagsSelection}</ul>
-               <ul>{artist}</ul>
+            <div style={{display: "flex"}}>
+               <ul><h>Tags/Genre</h>{tagsSelection}</ul>
+                <table class="datatable">
+                  <thead class="thead-light">
+                    <tr>
+                      <th>Artist Name</th>
+                      <th>Popularity (Total listeners across their top 10 tracks)</th>
+                    </tr>
+                  </thead>
+                  <tbody>{artist}</tbody>
+                </table>   
+               {/* <ul>{artist}</ul> */}
             </div>
 
         );
