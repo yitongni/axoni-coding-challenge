@@ -8,32 +8,74 @@ class TagSelection extends Component {
     super();
     this.state= {
         tags: [],
-        artists: []
+        artistsName: [],
+        artistTotalListener: []
     };
   }
     
-    async getTopArtist(tagName){
+
+  async getTopArtist(tagName){
       const API_KEY=process.env.REACT_APP_API_KEY
+      // res.data.topartists.artist
       let url=`http://ws.audioscrobbler.com/2.0/?method=tag.gettopartists&tag=${tagName}&api_key=${API_KEY}&format=json`
         
-      let listofArtist = await axios
-        .get(url)
-        .then(res => res.data.topartists.artist)
-        .catch(error => {
-          console.log(error);
-        });
+      await axios
+      .get(url)
+      .then(async res => {
+        if(res.data){
+          console.log(res.data.topartists.artist)
+          let artistAndTheirTotalListener = await res.data.topartists.artist.map(async artistName =>{
+    
+          const data={limit: 10}
+          let url=`http://ws.audioscrobbler.com/2.0/?method=artist.gettoptracks&artist=${artistName.name}&api_key=${API_KEY}&format=json`
 
-        console.log(listofArtist)
-     
-      let artistList = listofArtist.map(artist => {
-          return {artistsName: artist.name}
-      })
+          let artistTop10Tracks = await axios
+          .get(url, {params: data})
+          .then(res => res.data)
+          .catch(error => {
+            console.log(error);
+          });
+          let artistTotalListeners = artistTop10Tracks.toptracks.track.map(tracks => {return parseInt(tracks.listeners)})
+          let totalListenersForTop10Tracks=artistTotalListeners.reduce(function (a, b) {return a + b;});
+          console.log({name: artistName.name, totalListeners: totalListenersForTop10Tracks})
+          let copyState = this.state.artistTotalListener.slice();
+          copyState.push({name: artistName.name, totalListeners: totalListenersForTop10Tracks})
+          copyState.sort(function(a, b){
+            return b.totalListeners-a.totalListeners
+          })
+          this.setState({ artistTotalListener: copyState}, ()=>{console.log(this.state.artistTotalListener)})
 
-      this.setState({ artists: artistList}, ()=>{
-        console.log(this.state.artists)
+        })
+          
+         
+        }
       })
-      
-    }
+      .catch(error => {
+        console.log(error);
+      });
+  }
+
+  // async getArtistTotalListener(artistName){
+  //     // const API_KEY=process.env.REACT_APP_API_KEY
+
+  //     // let artistAndTheirTotalListener = await artistName.map(async artistName =>{
+  //     //   const data={limit: 10}
+  //     //   let url=`http://ws.audioscrobbler.com/2.0/?method=artist.gettoptracks&artist=${artistName.name}&api_key=${API_KEY}&format=json`
+  
+  //     //   let artistTop10Tracks =  await axios
+  //     //     .get(url, {params: data})
+  //     //     .then(res => res.data)
+  //     //     .catch(error => {
+  //     //       console.log(error);
+  //     //     });
+  //     //     let artistTotalListeners = artistTop10Tracks.toptracks.track.map(tracks => {return parseInt(tracks.listeners)})
+  //     //     let totalListenersForTop10Tracks=artistTotalListeners.reduce(function (a, b) {return a + b;});
+  //     //     console.log({name: artistName.name, totalListeners: totalListenersForTop10Tracks})
+  //     //     return {name: artistName.name, totalListeners: totalListenersForTop10Tracks}
+  //     // })
+  //     // console.log(artistAndTheirTotalListener)
+  //   }
+  
 
     async getTags() { 
       const API_KEY=process.env.REACT_APP_API_KEY
@@ -55,8 +97,6 @@ class TagSelection extends Component {
 
 
     }
-
-
     
     componentDidMount() {
       this.getTags()
@@ -65,7 +105,6 @@ class TagSelection extends Component {
     
 
     render(){
-      
       let tagsSelection= this.state.tags.map(tagsName => {
         return(
         <li key={tagsName.tagName} onClick={() => {this.getTopArtist(tagsName.tagName)}}>
@@ -74,10 +113,11 @@ class TagSelection extends Component {
         )
       })
 
-      let artist= this.state.artists.map(artistName => {
+      let artist= this.state.artistTotalListener.map(artist=> {
         return(
-        <li key={artistName.artistsName}>
-            {artistName.artistsName}
+        <li key={artist.name}>
+            {artist.name}
+            {artist.totalListeners}
           </li> 
         )
       })
