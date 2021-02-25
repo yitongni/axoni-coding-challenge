@@ -8,15 +8,14 @@ class TagSelection extends Component {
     super();
     this.state= {
         tags: [],
-        artistsName: [],
-        artistTotalListener: []
+        artistTotalListener: [],
+        redirect: false
     };
   }
     
 
   async getTopArtist(tagName){
       const API_KEY=process.env.REACT_APP_API_KEY
-      // res.data.topartists.artist
       let url=`http://ws.audioscrobbler.com/2.0/?method=tag.gettopartists&tag=${tagName}&api_key=${API_KEY}&format=json`
         
       await axios
@@ -55,28 +54,6 @@ class TagSelection extends Component {
       });
   }
 
-  // async getArtistTotalListener(artistName){
-  //     // const API_KEY=process.env.REACT_APP_API_KEY
-
-  //     // let artistAndTheirTotalListener = await artistName.map(async artistName =>{
-  //     //   const data={limit: 10}
-  //     //   let url=`http://ws.audioscrobbler.com/2.0/?method=artist.gettoptracks&artist=${artistName.name}&api_key=${API_KEY}&format=json`
-  
-  //     //   let artistTop10Tracks =  await axios
-  //     //     .get(url, {params: data})
-  //     //     .then(res => res.data)
-  //     //     .catch(error => {
-  //     //       console.log(error);
-  //     //     });
-  //     //     let artistTotalListeners = artistTop10Tracks.toptracks.track.map(tracks => {return parseInt(tracks.listeners)})
-  //     //     let totalListenersForTop10Tracks=artistTotalListeners.reduce(function (a, b) {return a + b;});
-  //     //     console.log({name: artistName.name, totalListeners: totalListenersForTop10Tracks})
-  //     //     return {name: artistName.name, totalListeners: totalListenersForTop10Tracks}
-  //     // })
-  //     // console.log(artistAndTheirTotalListener)
-  //   }
-  
-
     async getTags() { 
       const API_KEY=process.env.REACT_APP_API_KEY
       let url=`http://ws.audioscrobbler.com/2.0/?method=tag.getTopTags&api_key=${API_KEY}&format=json`
@@ -98,13 +75,22 @@ class TagSelection extends Component {
 
     }
     
+
     componentDidMount() {
       this.getTags()
     }
 
-    
+    getArtistInfo(artistName){
+      this.props.history.push(`/artist/${artistName}`);
+      this.setState({redirect: true})
+    }
 
     render(){
+
+      if (this.state.redirect) {
+        return <Redirect to="/artist"/>;
+      }
+
       let tagsSelection= this.state.tags.map(tagsName => {
         return(
         <li key={tagsName.tagName} onClick={() => {this.getTopArtist(tagsName.tagName)}}>
@@ -115,8 +101,8 @@ class TagSelection extends Component {
 
       let artist= this.state.artistTotalListener.map(artist=> {
         return(
-        <li key={artist.name}>
-            {artist.name}
+        <li key={artist.name} onClick={() => {this.getArtistInfo(artist.name)}}>
+            {artist.name }
             {artist.totalListeners}
           </li> 
         )
