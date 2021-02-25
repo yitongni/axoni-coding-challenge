@@ -8,6 +8,10 @@ class Album extends Component {
 
     albumName: this.props.match.params.albumName,
     artistName: this.props.match.params.artistName,
+    relateDate: "",
+    tracks: [],
+    tags: [],
+    imgURL: ""
   }
   async componentDidMount(){
 
@@ -21,6 +25,12 @@ class Album extends Component {
                   });
                   console.log(albummetadata)
 
+        this.setState({ 
+          tags: albummetadata.album.tags.tag,
+          tracks: albummetadata.album.tracks.track,
+          imgURL: albummetadata.album.image[2]["#text"],
+            // relateDate: albummetadata.album.wiki.published
+                  }, ()=>{console.log(this.state.relateDate)})
         // if(res.data){
             //     console.log(res.data)
             //     let albuminfo = await res.data.topalbums.album.map(async albums =>{
@@ -35,12 +45,30 @@ class Album extends Component {
 
     render(){
     
-       
+      let associatedTags= this.state.tags.map(tagsName => {
+        return(
+        <li key={tagsName.name}>
+            {tagsName.name}
+          </li> 
+        )
+      })
+
+      let associatedTrakcs= this.state.tracks.map(tracks => {
+        return(
+        <li key={tracks.name}>
+            {tracks.name}
+          </li> 
+        )
+      })
         return (
             <div>  
                <h1>HI</h1>
                <p>{this.state.albumName}</p>
                <p>{this.state.artistName}</p>
+               <img src={this.state.imgURL}></img>
+               <p>{this.state.relateDate}</p>
+               <ul>{associatedTags}</ul>
+               <ul>{associatedTrakcs}</ul>
             </div>
 
         );
