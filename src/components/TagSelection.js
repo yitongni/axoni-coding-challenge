@@ -112,7 +112,7 @@ class TagSelection extends Component {
 
         return (
             <div style={{display: "flex"}}>
-               <ul><h>Tags/Genre</h>{tagsSelection}</ul>
+               <ul class="tagUL"><h>Tags/Genre</h>{tagsSelection}</ul>
                 <table class="datatable">
                   <thead class="thead-light">
                     <tr>
@@ -122,7 +122,6 @@ class TagSelection extends Component {
                   </thead>
                   <tbody>{artist}</tbody>
                 </table>   
-               {/* <ul>{artist}</ul> */}
             </div>
 
         );

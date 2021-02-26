@@ -1,0 +1,14 @@
+h1{
+    text-align: center;
+}
+
+p{
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    font-size: 15px;
+}
+
+.associatedTags{
+    list-style:none;
+    display: flex;
+    
+}

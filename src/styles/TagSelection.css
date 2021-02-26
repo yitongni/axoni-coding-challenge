@@ -2,19 +2,18 @@ li {
     list-style-type: none;
     padding: 5px;
     font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-    font-size: 15px; 
+    font-size: 16px; 
 }
 
 li:hover {
     color: #ff00ff;
 }
 
-ul{
+.tagUL{
     font-size: 18px;
     margin: 0;
     border-right: 1px solid black;
     padding: 1rem;
-    display: inline;
 }
 
 h{
