@@ -1,7 +1,9 @@
-import React, { Component } from "react";
+import React, { Component , useState} from "react";
 import axios from "axios";
 import { Redirect, Link, withRouter } from "react-router-dom";
-import { Dropdown } from "react-bootstrap";
+import ReadMoreReact from 'read-more-react';
+import styles from "../styles/Artist.css";
+import { Container, Button } from 'react-bootstrap'
 
 class Artist extends Component {
   state= {
@@ -11,8 +13,11 @@ class Artist extends Component {
         tags: [],
         similarArtist: [],
         albums: [],
-        redirect: false
+        redirectToAlbum: false,
+        redirectToArtist: false,
+        expanded: false 
   }
+
   async componentDidMount(){
     const API_KEY=process.env.REACT_APP_API_KEY
 
@@ -33,20 +38,6 @@ class Artist extends Component {
           tags: artistBio.artist.tags.tag,
           similarArtist: similar
         }, ()=>{console.log(this.state.imageURL)})
-
-        // if(res.data){
-            //     console.log(res.data)
-            //     let albuminfo = await res.data.topalbums.album.map(async albums =>{
-            //         let albumUrl=` http://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=${API_KEY}&artist=${this.state.artistName}&album=${albums.name}&format=json`
-            //             let albummetadata=await axios
-            //             .get(albumUrl)
-            //             .then(result => result.data)
-            //             .catch(error => {
-            //                 console.log(error);
-            //             });
-            //             console.log(albummetadata)
-
-            //         })
        
         let albumUrl=`http://ws.audioscrobbler.com/2.0/?method=artist.gettopalbums&artist=${this.state.artistName}&api_key=${API_KEY}&format=json`
         
@@ -56,21 +47,29 @@ class Artist extends Component {
           .catch(error => {
             console.log(error);
           });
-          this.setState({ 
-            albums: artistAlbum.topalbums.album
-          }, ()=>{console.log(this.state.albums)})
+          this.setState({ albums: artistAlbum.topalbums.album}, ()=>{console.log(this.state.albums)})
     }
 
     getAlbumInfo(album){
         this.props.history.push(`/artist/${this.state.artistName}/${album}`);
-        this.setState({redirect: true})
-      }
+        this.setState({redirectToAlbum: true})
+    }
+
+    getAnotherArtist(artistName){
+      this.props.history.push(`/artist/${artistName}`);
+      this.setState({redirectToArtist: true})
+      window.location.reload();
+    }
+
+
+    showMore = () => { 
+      this.setState({ expanded: !this.state.expanded })
+    }
 
     render(){
-    
         let associatedTags= this.state.tags.map(tagsName => {
             return(
-            <li key={tagsName.name}>
+            <li class="associatedTags"key={tagsName.name}>
                 {tagsName.name}
               </li> 
             )
@@ -78,10 +77,9 @@ class Artist extends Component {
         
           let similarArtist= this.state.similarArtist.map(artist => {
             return(
-            <li key={artist.name} >
+            <li key={artist.name} onClick={() => {this.getAnotherArtist(artist.name)}}>
                 {artist.name}
-                {artist.url}
-              </li> 
+            </li> 
             )
           })
 
@@ -92,14 +90,22 @@ class Artist extends Component {
               </li> 
             )
           })
+
+         console.log(this.state.artistBio)
+         const { expanded } = this.state
         return (
             <div>  
                <h1>{this.state.artistName}</h1>
-               <img src={this.state.imageURL}></img>
-               <p>{this.state.artistBio}</p>
-               <ul>{associatedTags}</ul>
-               <ul>{similarArtist}</ul>
-               <ul>{artistAlbum}</ul>
+               <ul class="associatedTags">{associatedTags}</ul>
+               {/* <img src={this.state.imageURL}></img> */}
+               <div>
+                <Container>
+                  <Button onClick={this.showMore}>Read Artist Bio</Button>
+                    {expanded &&<div>{this.state.artistBio}</div>}
+                </Container>
+               </div>
+               <ul>Similar Artist {similarArtist}</ul>
+               <ul>Artist's Album {artistAlbum}</ul>
             </div>
 
         );
